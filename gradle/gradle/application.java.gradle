@@ -2,22 +2,22 @@
 
 subprojects {
 	apply plugin: 'java'
-	
-	group = 'org.syncany'		
-		
+
+	group = 'org.syncany'
+
 	sourceCompatibility = 1.8
 	targetCompatibility = 1.8
-	
+
 	repositories {
 		mavenCentral()
 	}
-	
+
 	sourceSets {
 		main {
 			java      { srcDirs = ['src/main/java']}
 			resources { srcDirs = ['src/main/resources']}
 		}
-		
+
 		test {
 			java      { srcDirs = ['src/test/java']}
 			resources { srcDirs = ['src/test/resources']}
@@ -28,30 +28,30 @@ subprojects {
 			resources { srcDirs = ['src/it/resources']}
 			compileClasspath += sourceSets.test.compileClasspath
 			runtimeClasspath += sourceSets.test.runtimeClasspath
-			output.classesDir = sourceSets.test.output.classesDir
-		} 
+			//output.classesDir = sourceSets.test.output.classesDir
+		}
 	}
 
 	dependencies {
 		integrationCompile sourceSets.test.output
 	}
-	
-	processResources {	
+
+	processResources {
 		from(source) {
 			include "**/*.properties", "**/*.xml", "**/*.skel"
-			filter{ String line -> line.replaceAll('%applicationRelease%', "${applicationRelease}") }        	            
-			filter{ String line -> line.replaceAll('%applicationVersion%', "${applicationVersion}") }        	            
-			filter{ String line -> line.replaceAll('%applicationVersionFull%', "${applicationVersionFull}") }        	            
+			filter{ String line -> line.replaceAll('%applicationRelease%', "${applicationRelease}") }
+			filter{ String line -> line.replaceAll('%applicationVersion%', "${applicationVersion}") }
+			filter{ String line -> line.replaceAll('%applicationVersionFull%', "${applicationVersionFull}") }
 			filter{ String line -> line.replaceAll('%applicationRevision%', "${applicationRevision}") }
-			filter{ String line -> line.replaceAll('%applicationDate%', "${asUTC(applicationDate, 'EEE, dd MMM yyyy HH:mm:ss Z')}") }          	            
+			filter{ String line -> line.replaceAll('%applicationDate%', "${asUTC(applicationDate, 'EEE, dd MMM yyyy HH:mm:ss Z')}") }
 		}
-	}		
-	
+	}
+
 	// JAR /////////////////////////////////////////////////////////////////////
-	
+
 	jar {
 		baseName = "${project.name}"
-		version  = "$applicationVersionFull"				
+		version  = "$applicationVersionFull"
 	}
 }
 
