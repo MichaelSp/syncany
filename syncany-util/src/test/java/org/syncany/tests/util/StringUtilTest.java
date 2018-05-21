@@ -1,6 +1,6 @@
 /*
  * Syncany, www.syncany.org
- * Copyright (C) 2011-2016 Philipp C. Heckel <philipp.heckel@gmail.com> 
+ * Copyright (C) 2011-2016 Philipp C. Heckel <philipp.heckel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,52 +21,54 @@ import static org.junit.Assert.assertArrayEquals;
 import static org.junit.Assert.assertEquals;
 
 import java.util.Arrays;
+import java.util.Locale;
 
 import org.junit.Test;
 import org.syncany.util.StringUtil;
 import org.syncany.util.StringUtil.StringJoinListener;
 
 public class StringUtilTest {
-	@Test 
+	@Test
 	public void testFromHexToHex() {
 		assertEquals("abcdeffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa", StringUtil.toHex(StringUtil.fromHex("abcdeffaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa")));
-		assertEquals("", StringUtil.toHex(StringUtil.fromHex("")));		
+		assertEquals("", StringUtil.toHex(StringUtil.fromHex("")));
 	}
-	
+
 	@Test(expected=Exception.class)
 	public void testFromHexInvalid1() {
 		StringUtil.toHex(StringUtil.fromHex("a"));
 	}
-	
+
 	@Test(expected=Exception.class)
 	public void testFromHexInvalid2() {
 		StringUtil.toHex(StringUtil.fromHex("INVALID!"));
 	}
-	
+
 	@Test(expected=Exception.class)
 	public void testFromHexInvalid3() {
 		StringUtil.toHex(StringUtil.fromHex("INVALID"));
 	}
-	
+
 	@Test
 	public void testStringJoin() {
+		Locale.setDefault(new Locale("en", "en_US"));
 		assertEquals("a;b;c", StringUtil.join(new String[] { "a",  "b", "c" }, ";"));
 		assertEquals("a b c", StringUtil.join(Arrays.asList(new String[] { "a",  "b", "c" }), " "));
 		assertEquals("1.9 + 2.8 + 3.7", StringUtil.join(new Double[] { 1.911, 2.833, 3.744 }, " + ", new StringJoinListener<Double>() {
 			@Override
 			public String getString(Double number) {
 				return String.format("%.1f", number);
-			}			
+			}
 		}));
 	}
-	
+
 	@Test
 	public void testToBytesUTF8() {
 		assertArrayEquals(new byte[] { 0x00 }, StringUtil.toBytesUTF8("\0"));
 		assertArrayEquals(new byte[] { (byte) 0xc3, (byte) 0xa4, (byte) 0xc3, (byte) 0xb6, (byte) 0xc3, (byte) 0xbc }, StringUtil.toBytesUTF8("äöü"));
-		assertArrayEquals(new byte[] { (byte) 0xe7, (byte) 0xac, (byte) 0xaa, (byte) 0xe9, (byte) 0xaa, (byte) 0x8f }, StringUtil.toBytesUTF8("笪骏")); 
+		assertArrayEquals(new byte[] { (byte) 0xe7, (byte) 0xac, (byte) 0xaa, (byte) 0xe9, (byte) 0xaa, (byte) 0x8f }, StringUtil.toBytesUTF8("笪骏"));
 	}
-	
+
 	@Test
 	public void testToCamelCase() {
 		assertEquals("HelloWorld", StringUtil.toCamelCase("hello world"));
@@ -74,16 +76,16 @@ public class StringUtilTest {
 		assertEquals("HelloWorld", StringUtil.toCamelCase("hello-world"));
 		assertEquals("HelloWorld", StringUtil.toCamelCase("hello-World"));
 	}
-	
+
 	@Test
 	public void testToSnakeCase() {
 		assertEquals("hello_world", StringUtil.toSnakeCase("hello world"));
 		assertEquals("hello_world", StringUtil.toSnakeCase("HelloWorld"));
 		assertEquals("hello_world", StringUtil.toSnakeCase("helloWorld"));
 		assertEquals("hello_world", StringUtil.toSnakeCase("hello_world"));
-		assertEquals("s3", StringUtil.toSnakeCase("s3"));		
+		assertEquals("s3", StringUtil.toSnakeCase("s3"));
 	}
-	
+
 	@Test
 	public void testSubstrCount() {
 		assertEquals(1, StringUtil.substrCount("some/path", "/"));

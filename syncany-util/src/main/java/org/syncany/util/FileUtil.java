@@ -80,21 +80,20 @@ public class FileUtil {
 	}
 
 	public static byte[] createChecksum(File filename, String digestAlgorithm) throws NoSuchAlgorithmException, IOException {
-		FileInputStream fis = new FileInputStream(filename);
+		try(FileInputStream fis = new FileInputStream(filename)) {
 
-		byte[] buffer = new byte[1024];
-		MessageDigest complete = MessageDigest.getInstance(digestAlgorithm);
-		int numRead;
+			byte[] buffer = new byte[1024];
+			MessageDigest complete = MessageDigest.getInstance(digestAlgorithm);
+			int numRead;
 
-		do {
-			numRead = fis.read(buffer);
-			if (numRead > 0) {
-				complete.update(buffer, 0, numRead);
-			}
-		} while (numRead != -1);
-
-		fis.close();
-		return complete.digest();
+			do {
+				numRead = fis.read(buffer);
+				if (numRead > 0) {
+					complete.update(buffer, 0, numRead);
+				}
+			} while (numRead != -1);
+			return complete.digest();
+		}
 	}
 
 	public static boolean isFileLocked(File file) {

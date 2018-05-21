@@ -1,6 +1,6 @@
 /*
  * Syncany, www.syncany.org
- * Copyright (C) 2011-2016 Philipp C. Heckel <philipp.heckel@gmail.com> 
+ * Copyright (C) 2011-2016 Philipp C. Heckel <philipp.heckel@gmail.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +32,7 @@ import org.syncany.util.EnvironmentUtil;
 import org.syncany.util.FileUtil;
 import org.syncany.util.StringUtil;
 
-public class FileUtilTest {	
+public class FileUtilTest {
 	@Test
 	public void testGetRelativePath() {
 		if (EnvironmentUtil.isUnixLikeOperatingSystem()) {
@@ -48,27 +48,27 @@ public class FileUtilTest {
 			assertEquals("path", FileUtil.getRelativePath(new File("C:\\homesome\\"), new File("C:\\home\\some\\path")));
 		}
 	}
-	
+
 	@Test
 	public void testFileExistsNormal() throws Exception {
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		TestFileUtil.createRandomFile(new File(tempDir, "file1"), 1234);
-		
+
 		assertTrue(FileUtil.exists(new File(tempDir, "file1")));
 		assertFalse(FileUtil.exists(new File(tempDir, "file2")));
-		
+
 		TestFileUtil.deleteDirectory(tempDir);
 	}
-	
+
 	@Test
 	public void testFileExistsSymlink() throws Exception {
 		if (!EnvironmentUtil.symlinksSupported()) {
 			return;
 		}
-		
+
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		TestFileUtil.createRandomFile(new File(tempDir, "file1"), 1234);
 
 		Files.createSymbolicLink(new File(tempDir, "link-to-file1").toPath(), new File(tempDir, "file1").toPath());
@@ -76,24 +76,24 @@ public class FileUtilTest {
 
 		String linkTargetToFile1 = FileUtil.readSymlinkTarget(new File(tempDir, "link-to-file1"));
 		String nonExistingSymlinkTarget = FileUtil.readSymlinkTarget(new File(tempDir, "non-existing-target"));
-		
+
 		assertEquals(new File(tempDir, "file1").getAbsolutePath(), linkTargetToFile1);
-		assertEquals("/does/not/exist", nonExistingSymlinkTarget);		
+		assertEquals("/does/not/exist", nonExistingSymlinkTarget);
 		assertTrue(FileUtil.exists(new File(tempDir, "link-to-file1")));
 		assertTrue(FileUtil.exists(new File(tempDir, "non-existing-target")));
 		assertFalse(FileUtil.exists(new File(tempDir, "actually-non-existing-file-or-link")));
-		
-		TestFileUtil.deleteDirectory(tempDir);		
+
+		TestFileUtil.deleteDirectory(tempDir);
 	}
-	
+
 	@Test
 	public void testCreateSymlink() throws Exception {
 		if (!EnvironmentUtil.symlinksSupported()) {
 			return;
 		}
-		
+
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		TestFileUtil.createRandomFile(new File(tempDir, "file1"), 1234);
 
 		FileUtil.createSymlink("/some/target", new File(tempDir, "link-to-non-existing-target"));
@@ -101,74 +101,76 @@ public class FileUtilTest {
 
 		String linkTargetToFile1 = FileUtil.readSymlinkTarget(new File(tempDir, "link-to-file1"));
 		String nonExistingSymlinkTarget = FileUtil.readSymlinkTarget(new File(tempDir, "link-to-non-existing-target"));
-		
+
 		assertEquals(new File(tempDir, "file1").getAbsolutePath(), linkTargetToFile1);
-		assertEquals("/some/target", nonExistingSymlinkTarget);		
-		
-		TestFileUtil.deleteDirectory(tempDir);		
+		assertEquals("/some/target", nonExistingSymlinkTarget);
+
+		TestFileUtil.deleteDirectory(tempDir);
 	}
 
 	@Test
 	public void testGetCanonicalFile() throws Exception {
 		if (EnvironmentUtil.isUnixLikeOperatingSystem()) {
-			assertEquals(new File("/a"), FileUtil.getCanonicalFile(new File("/tmp/../a")));
+			// if /tmp exists and is a symlink (like on Mac) the test will fail
+			// https://stackoverflow.com/questions/43808602/temporaryfolder-and-filegetcanonicalfile-on-mac
+			assertEquals(new File("/a"), FileUtil.getCanonicalFile(new File("/tmps/../a")));
 		}
 		else {
 			assertEquals(new File("C:\\a"), FileUtil.getCanonicalFile(new File("C:\\Windows\\..\\a")));
 		}
 	}
-	
+
 	@Test
 	public void testCreateChecksum() throws Exception {
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		TestFileUtil.createFileWithContent(new File(tempDir, "file"), "000");
-		
+
 		byte[] sha1sum = FileUtil.createChecksum(new File(tempDir, "file"), "SHA1");
 		byte[] md5sum = FileUtil.createChecksum(new File(tempDir, "file"), "MD5");
-		
+
 		assertNotNull(sha1sum);
 		assertNotNull(md5sum);
 		assertEquals("8aefb06c426e07a0a671a1e2488b4858d694a730", StringUtil.toHex(sha1sum));
 		assertEquals("c6f057b86584942e415435ffb1fa93d4", StringUtil.toHex(md5sum));
-		
+
 		TestFileUtil.deleteDirectory(tempDir);
 	}
 
 	@Test
 	public void testIsDirectory() throws Exception {
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		new File(tempDir, "folder").mkdir();
 		new File(tempDir, "file").createNewFile();
 		assertTrue(FileUtil.isDirectory(new File(tempDir, "folder")));
 		assertFalse(FileUtil.isDirectory(new File(tempDir, "file")));
-		
+
 		if (EnvironmentUtil.symlinksSupported()) {
 			FileUtil.createSymlink(new File(tempDir, "folder").getAbsolutePath(), new File(tempDir, "symlink-to-folder"));
 			assertFalse(FileUtil.isDirectory(new File(tempDir, "symlink-to-folder")));
 		}
-		
+
 		TestFileUtil.deleteDirectory(tempDir);
-		
+
 	}
-	
+
 	@Test
 	public void testFileLocked() throws Exception {
 		// Setup
 		File tempDir = TestFileUtil.createTempDirectoryInSystemTemp();
-		
+
 		// Run
 		File lockedFile = TestFileUtil.createRandomFileInDirectory(tempDir, 50*1024);
-		
+
 		// Test
 		assertFalse("File should not be locked: "+lockedFile, FileUtil.isFileLocked(lockedFile));
-		 
-		RandomAccessFile fileLock = new RandomAccessFile(lockedFile, "rw");		
+
+		RandomAccessFile fileLock = new RandomAccessFile(lockedFile, "rw");
 		FileLock lockedFileLock = fileLock.getChannel().lock();
-		
+
 		assertTrue("File should be locked: "+lockedFile, FileUtil.isFileLocked(lockedFile));
-		 
+
 		// Tear down
 		lockedFileLock.release();
 		fileLock.close();
@@ -179,10 +181,10 @@ public class FileUtilTest {
 		}
 		else if (EnvironmentUtil.isUnixLikeOperatingSystem()) {
 			Files.setPosixFilePermissions(bFilePath, PosixFilePermissions.fromString("r--r--r--"));
-		}	
-		
+		}
+
 		assertFalse("File should not be locked if read-only: "+lockedFile, FileUtil.isFileLocked(lockedFile));
-		
+
 		// Tear down
 		TestFileUtil.deleteDirectory(tempDir);
 	}

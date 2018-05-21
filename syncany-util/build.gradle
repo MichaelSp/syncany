@@ -1,18 +1,20 @@
 apply plugin: 'eclipse'
 
 configurations {
-	tests
+    tests
 }
 
 repositories {
-	mavenCentral()
+    mavenCentral()
 }
 
 dependencies {
-	compile			"commons-io:commons-io:2.4"
-	compile			"org.hsqldb:hsqldb:2.3.1"
-	            	
-	testCompile		"junit:junit:4.9"   	      
+    compile "commons-io:commons-io:2.4"
+    compile "org.hsqldb:hsqldb:2.3.1"
+
+    compile 'javax.xml.bind:jaxb-api:2.3.0'
+
+    testCompile "junit:junit:4.9"
 }
 
 
